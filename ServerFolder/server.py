@@ -39,7 +39,7 @@ class Server(threading.Thread):
 
         logging.info("Data preprocessed")
         self.print_bericht_gui_server("Data preprocessed")
-        return pd.read_csv("ServerFolder\merged_dataset.csv")
+        return pd.read_csv("merged_dataset.csv")
 
     @property
     def is_connected(self):
