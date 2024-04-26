@@ -65,10 +65,14 @@ class ClientHandler(threading.Thread):
                     )
                     obj.countries = countries
 
+                elif commando == "GetCountry":
+                    print("GetCountry")
+                    obj = jsonpickle.decode(data)
+                    country = self.search_country_by_name(obj.Country)
+                    obj.Country = country
+
                 self.client_io_obj.write(commando + "\n")
-                self.client_io_obj.write(
-                    jsonpickle.encode(obj) + "\n"
-                )  # data zit in list
+                self.client_io_obj.write(jsonpickle.encode(obj) + "\n")
                 self.client_io_obj.flush()
 
                 commando = io_stream_client.readline().rstrip("\n")
@@ -94,3 +98,18 @@ class ClientHandler(threading.Thread):
         ]
 
         return filtered_countries.index.tolist()
+
+    def search_country_by_name(self, country_name):
+        # Filter DataFrame based on country name
+        filtered_df = self.dataset[self.dataset["Country"] == country_name]
+
+        # Selecting only 'Year' and 'Happiness Score' columns
+        filtered_df = filtered_df[["Year", "Happiness Score"]]
+
+        # Converting DataFrame to a list of tuples
+        score_per_year = [
+            (row["Year"], row["Happiness Score"])
+            for index, row in filtered_df.iterrows()
+        ]
+
+        return score_per_year
