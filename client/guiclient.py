@@ -10,6 +10,7 @@ print(sys.path[0])
 import logging
 import socket
 from tkinter import *
+from Data.GetCountriesHappines import GetCountriesHappines
 
 from tkinter import messagebox
 from tkinter import ttk
@@ -18,33 +19,47 @@ from tkinter.ttk import Combobox
 import jsonpickle
 import tkinter as tk
 from tkinter import ttk
+import threading
 
 
-class Window(Frame):
+class Window(Frame, threading.Thread):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        threading.Thread.__init__(self)
         self.master = master
         self.init_window()
         self.makeConnnectionWithServer()
+        self.start()
 
     def init_window(self):
-        # Maak een lijst met de opties
-        options = ["downloads", "rating", "number of reviews"]
+        # changing the title of our master widget
+        self.master.title("Happines score")
+        self.master.geometry("800x600")
 
-        # Maak een combobox
-        combo_box = ttk.Combobox(root, values=options)
+        # allowing the widget to take the full space of the root window
+        self.pack(fill=BOTH, expand=1)
 
-        # Stel de huidige waarde van de combobox in op de eerste optie ("downloads")
-        combo_box.current(0)
+        Label(
+            self, text="Geef de range van happines score waartussen je wil zoeken:"
+        ).grid(row=0)
 
-        # Plaats de combobox op rij 1 en kolom 2
-        combo_box.grid(row=0, column=1)
-        Label(self, text="Sort by").grid(row=1, column=0)
+        self.entry_happinesScore1 = Entry(self, width=20)
+        self.entry_happinesScore2 = Entry(self, width=20)
 
-        self.requestbutton = Button(root, text="Request", command=self.request)
-        self.requestbutton.grid(row=2, column=0, columnspan=2, pady=(5, 5), padx=(5, 5))
+        self.entry_happinesScore1.grid(
+            row=1, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5)
+        )
+        self.entry_happinesScore2.grid(
+            row=2, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0)
+        )
 
-        Grid.rowconfigure(self, 3, weight=1)
+        self.requestbutton = Button(
+            self, text="Request", command=self.GetCountriesWithHappinesScore
+        )
+        self.requestbutton.grid(row=3, column=0)
+        # self.requestbutton.grid(row=3, column=0)
+
+        Grid.rowconfigure(self, 4, weight=1)
         Grid.columnconfigure(self, 1, weight=1)
 
     def makeConnnectionWithServer(self):
@@ -61,22 +76,32 @@ class Window(Frame):
         except Exception as ex:
             logging.error(f"Foutmelding: {ex}")
 
-    def request(self):
+    def GetCountriesWithHappinesScore(self):
         try:
-            logging.info("Requesting data from server...")
-            # Send request to server
-            self.my_writer_obj.write(f"request")
+            logging.info("Get countries with happines score...")
+            happinesScore1 = float(self.entry_happinesScore1.get())
+            happinesScore2 = float(self.entry_happinesScore2.get())
+
+            self.my_writer_obj.write(f"GetCountriesWithHappinesScore\n")
+            data = GetCountriesHappines(happinesScore1, happinesScore2)
+            self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
             self.my_writer_obj.flush()
-            # Receive data from server
-            data = self.my_writer_obj.readline().rstrip("\n")
-            self.my_writer_obj.flush()
-            logging.info(f"Received data from server: {data}")
-            # Convert data to Som object
-            som = jsonpickle.decode(data)
-            # Print data
-            logging.info(f"Som object: {som}")
+
         except Exception as ex:
             logging.error(f"Foutmelding: {ex}")
+
+    def run(self):
+        commando = self.my_writer_obj.readline().rstrip()
+        data = self.my_writer_obj.readline().rstrip()
+        while commando != "CLOSE":
+            if "GetCountriesWithHappinesScore" in commando:
+                result = jsonpickle.decode(data)  # class getcountrieshappines
+                print(result.countries)  # geen data in lsit
+                messagebox.showinfo(
+                    "Countries with happines score", str(result.countries)
+                )
+            commando = self.my_writer_obj.readline().rstrip("\n")
+            data = self.my_writer_obj.readline().rstrip("\n")
 
 
 logging.basicConfig(level=logging.INFO)

@@ -24,6 +24,7 @@ class ClientHandler(threading.Thread):
     def __init__(self, socketclient, messages_queue, par_dataset):
         threading.Thread.__init__(self)
         self.socketclient = socketclient
+        self.client_io_obj = self.socketclient.makefile(mode="rw")
         self.messages_queue = messages_queue
         self.id = ClientHandler.numbers_clienthandlers
 
@@ -49,19 +50,47 @@ class ClientHandler(threading.Thread):
 
     def run(self):
         io_stream_client = self.socketclient.makefile(mode="rw")
+        print("Started & waiting...")
         try:
-            message = io_stream_client.readline().rstrip()
-            while message != "CLOSE":
-                message = io_stream_client.readline().rstrip()
-                if message:
-                    self.bericht_servergui(f"CLH {self.id}:< {message}")
-                    self.process_message(message)
-                io_stream_client.flush()
+            commando = io_stream_client.readline().rstrip("\n")
+            data = io_stream_client.readline().rstrip("\n")
+            obj = None
+            while commando != "CLOSE":
+                if commando == "GetCountriesWithHappinesScore":
+                    print("GetCountriesWithHappinesScore")
+                    obj = jsonpickle.decode(data)
 
-                io_stream_client.write("allright\n")
+                    countries = self.search_countries_by_happiness_score(
+                        obj.Happines1, obj.Happines2
+                    )
+                    obj.country = countries
+
+                self.client_io_obj.write(commando + "\n")
+                self.client_io_obj.write(
+                    jsonpickle.encode(obj) + "\n"
+                )  # data zit in list
+                self.client_io_obj.flush()
+
+                commando = io_stream_client.readline().rstrip("\n")
+                data = io_stream_client.readline().rstrip("\n")
 
         except Exception as e:
             self.bericht_servergui(f"Error: {e}")
 
     def bericht_servergui(self, message):
         self.messages_queue.put(f"CLH {self.id}:> {message}")
+
+    def search_countries_by_happiness_score(self, min_score, max_score):
+
+        # Calculate the average happiness score across the 5 years for each country
+        average_scores_per_country = self.dataset.groupby("Country")[
+            "Happiness Score"
+        ].mean()
+
+        # Filter countries based on average happiness score range
+        filtered_countries = average_scores_per_country[
+            (average_scores_per_country >= min_score)
+            & (average_scores_per_country <= max_score)
+        ]
+
+        return filtered_countries.index.tolist()
