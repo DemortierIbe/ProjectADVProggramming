@@ -61,9 +61,9 @@ class ClientHandler(threading.Thread):
                     obj = jsonpickle.decode(data)
 
                     countries = self.search_countries_by_happiness_score(
-                        obj.Happines1, obj.Happines2
+                        obj.HappinessMin, obj.HappinessMax
                     )
-                    obj.country = countries
+                    obj.countries = countries
 
                 self.client_io_obj.write(commando + "\n")
                 self.client_io_obj.write(

@@ -62,6 +62,30 @@ class Window(Frame, threading.Thread):
         Grid.rowconfigure(self, 4, weight=1)
         Grid.columnconfigure(self, 1, weight=1)
 
+    def show_message_box(self, result):
+        window = tk.Toplevel()
+        window.title("Countries with Happiness Score")
+
+        text = tk.Text(window, wrap="word", height=20, width=50)
+        text.pack(side="left", fill="y", expand=True)
+
+        # Check if the list of countries is empty
+        if not result.countries:
+            text.insert(tk.END, "There is no country within this happiness score range")
+        else:
+            # Create a Scrollbar widget
+            scrollbar = tk.Scrollbar(window, command=text.yview)
+            scrollbar.pack(side="right", fill="y")
+            text.config(yscrollcommand=scrollbar.set)
+
+            # Insert the data into the Text widget
+            text.insert(tk.END, "\n".join(result.countries))
+
+            # Disable text editing
+            text.config(state=tk.DISABLED)
+
+        window.mainloop()
+
     def makeConnnectionWithServer(self):
         try:
             logging.info("Making connection with server...")
@@ -95,11 +119,8 @@ class Window(Frame, threading.Thread):
         data = self.my_writer_obj.readline().rstrip()
         while commando != "CLOSE":
             if "GetCountriesWithHappinesScore" in commando:
-                result = jsonpickle.decode(data)  # class getcountrieshappines
-                print(result.countries)  # geen data in lsit
-                messagebox.showinfo(
-                    "Countries with happines score", str(result.countries)
-                )
+                result = jsonpickle.decode(data)
+                self.master.after(0, self.show_message_box, result)
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
 
