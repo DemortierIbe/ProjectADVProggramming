@@ -88,8 +88,8 @@ class ClientHandler(threading.Thread):
                 elif commando == "GetCountry":
                     print("GetCountry")
                     obj = jsonpickle.decode(data)
-                    country = self.search_country_by_name(obj.Country)
-                    obj.Country = country
+                    score = self.search_country_by_name(obj.Country)
+                    obj.Score = score
 
                 elif commando == "GetCountriesWithBbp":
                     print("GetCountriesWithBbp")

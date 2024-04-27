@@ -18,6 +18,8 @@ from Data.Vergelijk2Landen import Vergelijk2Landen
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter.ttk import Combobox
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import jsonpickle
 import tkinter as tk
@@ -125,9 +127,11 @@ class Window(Frame, threading.Thread):
     def show_message_box_Score(self, result):
         window = tk.Toplevel()
         window.title("Countries with Happiness Score")
+        window.geometry("800x600")  # Set the window size
 
+        # Create a Text widget
         text = tk.Text(window, wrap="word", height=20, width=50)
-        text.pack(side="left", fill="y", expand=True)
+        text.pack(side="left", fill="both", expand=True)
 
         # Check if the list of countries is empty
         if not result:
@@ -142,14 +146,67 @@ class Window(Frame, threading.Thread):
             text.insert(
                 tk.END,
                 "\n".join(
-                    f"{item[0]} - Happiness Score: {item[1]}" for item in result.Country
+                    f"{item[0]} - Happiness Score: {item[1]}" for item in result.Score
                 ),
             )
 
             # Disable text editing
             text.config(state=tk.DISABLED)
 
+            # Plot the data
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(
+                [
+                    item[0] for item in result.Score
+                ],  # Extracting the year from each tuple
+                [
+                    item[1] for item in result.Score
+                ],  # Extracting the happiness score from each tuple
+                marker="o",
+                linestyle="-",
+            )
+            ax.set_title(
+                f"Evolution of Happiness Score over the Years for {result.Country}"
+            )
+            ax.set_xlabel("Year")
+            ax.set_ylabel("Happiness Score")
+            ax.grid(True)
+
+            # Embed the plot into the window
+            canvas = FigureCanvasTkAgg(fig, master=window)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
         window.mainloop()
+
+    # def show_message_box_Score(self, result):
+    #     window = tk.Toplevel()
+    #     window.title("Countries with Happiness Score")
+
+    #     text = tk.Text(window, wrap="word", height=20, width=50)
+    #     text.pack(side="left", fill="y", expand=True)
+
+    #     # Check if the list of countries is empty
+    #     if not result:
+    #         text.insert(tk.END, "This country does not exist")
+    #     else:
+    #         # Create a Scrollbar widget
+    #         scrollbar = tk.Scrollbar(window, command=text.yview)
+    #         scrollbar.pack(side="right", fill="y")
+    #         text.config(yscrollcommand=scrollbar.set)
+
+    #         # Insert the data into the Text widget
+    #         text.insert(
+    #             tk.END,
+    #             "\n".join(
+    #                 f"{item[0]} - Happiness Score: {item[1]}" for item in result.Country
+    #             ),
+    #         )
+
+    #         # Disable text editing
+    #         text.config(state=tk.DISABLED)
+
+    #     window.mainloop()
 
     def show_message_box_CountriesByAvgBbp(self, result):
         window = tk.Toplevel()
