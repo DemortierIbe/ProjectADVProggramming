@@ -71,6 +71,14 @@ class ClientHandler(threading.Thread):
                     country = self.search_country_by_name(obj.Country)
                     obj.Country = country
 
+                elif commando == "GetCountriesWithBbp":
+                    print("GetCountriesWithBbp")
+                    obj = jsonpickle.decode(data)
+                    countries = self.search_countries_by_avg_gdp_range(
+                        obj.BbpMin, obj.BbpMax
+                    )
+                    obj.countries = countries
+
                 self.client_io_obj.write(commando + "\n")
                 self.client_io_obj.write(jsonpickle.encode(obj) + "\n")
                 self.client_io_obj.flush()
@@ -113,3 +121,23 @@ class ClientHandler(threading.Thread):
         ]
 
         return score_per_year
+
+    def search_countries_by_avg_gdp_range(self, min_avg_gdp, max_avg_gdp):
+        print("search_countries_by_avg_gdp_range")
+        print(min_avg_gdp)
+        print(max_avg_gdp)
+        # Calculate the average GDP per capita across the 5 years for each country
+        avg_gdp_per_country = self.dataset.groupby("Country")[
+            "Economy (GDP per Capita)"
+        ].mean()
+
+        # Filter countries based on average GDP per capita range
+        filtered_countries = avg_gdp_per_country[
+            (avg_gdp_per_country >= min_avg_gdp) & (avg_gdp_per_country <= max_avg_gdp)
+        ]
+
+        # Get the names of the filtered countries
+        countries_within_avg_gdp_range = filtered_countries.index.tolist()
+        print(countries_within_avg_gdp_range)
+
+        return countries_within_avg_gdp_range
