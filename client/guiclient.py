@@ -26,6 +26,197 @@ import tkinter as tk
 from tkinter import ttk
 import threading
 
+score_range = [
+    0,
+    0.5,
+    1,
+    1.5,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    4.5,
+    5,
+    5.5,
+    6,
+    6.5,
+    7,
+    7.5,
+    8,
+    8.5,
+    9,
+    9.5,
+    10,
+]
+
+All_Countries = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahrain",
+    "Bangladesh",
+    "Belarus",
+    "Belgium",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Congo (Brazzaville)",
+    "Congo (Kinshasa)",
+    "Costa Rica",
+    "Croatia",
+    "Cyprus",
+    "Czech Republic",
+    "Denmark",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Estonia",
+    "Ethiopia",
+    "Finland",
+    "France",
+    "Gabon",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Guatemala",
+    "Guinea",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Ivory Coast",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kosovo",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Latvia",
+    "Lebanon",
+    "Liberia",
+    "Libya",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Mali",
+    "Malta",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Moldova",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Myanmar",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "Norway",
+    "Pakistan",
+    "Palestinian Territories",
+    "Panama",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "South Africa",
+    "South Korea",
+    "Spain",
+    "Sri Lanka",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Togo",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Uganda",
+    "Ukraine",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
+]
+
+Bbp_range = [
+    0,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1,
+    1.1,
+    1.2,
+    1.3,
+    1.4,
+    1.5,
+    1.6,
+    1.7,
+    1.8,
+    1.9,
+    2,
+]
+
 
 class Window(Frame, threading.Thread):
     def __init__(self, master=None):
@@ -37,25 +228,30 @@ class Window(Frame, threading.Thread):
         self.start()
 
     def init_window(self):
-        # changing the title of our master widget
-        self.master.title("Happines score")
-        self.master.geometry("800x600")
 
-        # allowing the widget to take the full space of the root window
+        self.master.title("Happines score")
+        self.master.geometry("450x500")
+
         self.pack(fill=BOTH, expand=1)
 
         # zoeken naar landen tussen een happines range
         Label(
-            self, text="Geef de range van happines score waartussen je wil zoeken:"
+            self, text="Geef de range van happines score waartussen u wil zoeken:"
         ).grid(row=0)
 
-        self.entry_happinesScoreMin = Entry(self, width=20)
-        self.entry_happinesScoreMax = Entry(self, width=20)
+        self.cmb_happinesScoreMin = Combobox(
+            self, state="readonly", values=score_range, width=20
+        )
+        self.cmb_happinesScoreMax = Combobox(
+            self, state="readonly", values=score_range, width=20
+        )
+        self.cmb_happinesScoreMin.current(0)
+        self.cmb_happinesScoreMax.current(1)
 
-        self.entry_happinesScoreMin.grid(
+        self.cmb_happinesScoreMin.grid(
             row=1, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5)
         )
-        self.entry_happinesScoreMax.grid(
+        self.cmb_happinesScoreMax.grid(
             row=2, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0)
         )
 
@@ -66,37 +262,45 @@ class Window(Frame, threading.Thread):
 
         # land opzoeken om gelukscore te zien
         Label(self, text="Geef een land in om de happines score te zien:").grid(row=4)
-        self.entry_country = Entry(self, width=20)
-        self.entry_country.grid(row=5, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
-
-        self.requestbutton = Button(
-            self, text="Search country", command=self.GetCountry
+        self.cmb_country = Combobox(
+            self, state="readonly", values=All_Countries, width=20
         )
+        self.cmb_country.current(0)
+        self.cmb_country.grid(row=5, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
+
+        self.requestbutton = Button(self, text="Search", command=self.GetCountry)
         self.requestbutton.grid(row=6, column=0, padx=(5, 5), pady=(5, 5))
 
         # landen tussen een bepaalde range van BBP
-        Label(self, text="Geef de range van BBP waartussen je wil zoeken:").grid(row=7)
-        self.entry_bbpMin = Entry(self, width=20)
-        self.entry_bbpMax = Entry(self, width=20)
+        Label(
+            self,
+            text="Geef de range van de BBP invloed op de happines score waartussen u wil zoeken:",
+        ).grid(row=7)
 
-        self.entry_bbpMin.grid(row=8, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
-        self.entry_bbpMax.grid(row=9, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
+        self.cmb_bbpMin = Combobox(self, state="readonly", values=Bbp_range, width=20)
+        self.cmb_bbpMax = Combobox(self, state="readonly", values=Bbp_range, width=20)
+        self.cmb_bbpMin.current(0)
+        self.cmb_bbpMax.current(1)
+        self.cmb_bbpMin.grid(row=8, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
+        self.cmb_bbpMax.grid(row=9, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
         self.requestbutton = Button(
             self, text="search", command=self.GetCountriesWithBbp
         )
         self.requestbutton.grid(row=10, column=0, padx=(5, 5), pady=(5, 5))
 
         # 2 landen opzoeken om te vergelijken
-        Label(self, text="Geef 2 landen in om te vergelijken:").grid(row=11)
-        self.entry_country1 = Entry(self, width=20)
-        self.entry_country2 = Entry(self, width=20)
+        Label(self, text="Geef 2 landen die u wilt vergelijken:").grid(row=11)
 
-        self.entry_country1.grid(
-            row=12, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5)
+        self.cmb_country1 = Combobox(
+            self, state="readonly", values=All_Countries, width=20
         )
-        self.entry_country2.grid(
-            row=13, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0)
+        self.cmb_country2 = Combobox(
+            self, state="readonly", values=All_Countries, width=20
         )
+        self.cmb_country1.current(0)
+        self.cmb_country2.current(1)
+        self.cmb_country1.grid(row=12, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
+        self.cmb_country2.grid(row=13, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
         self.requestbutton = Button(self, text="search", command=self.Vergelijk2Landen)
         self.requestbutton.grid(row=14, column=0, padx=(5, 5), pady=(5, 5))
         Grid.rowconfigure(self, 15, weight=1)
@@ -127,22 +331,20 @@ class Window(Frame, threading.Thread):
     def show_message_box_Score(self, result):
         window = tk.Toplevel()
         window.title("Countries with Happiness Score")
-        window.geometry("800x600")  # Set the window size
+        window.geometry("1200x800")
 
-        # Create a Text widget
+        # tekst widget maken
         text = tk.Text(window, wrap="word", height=20, width=50)
         text.pack(side="left", fill="both", expand=True)
 
-        # Check if the list of countries is empty
-        if not result:
+        if not result:  # kijken of het niet leeg is
             text.insert(tk.END, "This country does not exist")
         else:
-            # Create a Scrollbar widget
+
             scrollbar = tk.Scrollbar(window, command=text.yview)
             scrollbar.pack(side="right", fill="y")
             text.config(yscrollcommand=scrollbar.set)
 
-            # Insert the data into the Text widget
             text.insert(
                 tk.END,
                 "\n".join(
@@ -150,18 +352,13 @@ class Window(Frame, threading.Thread):
                 ),
             )
 
-            # Disable text editing
             text.config(state=tk.DISABLED)
 
-            # Plot the data
+            # plot maken
             fig, ax = plt.subplots(figsize=(10, 6))
             ax.plot(
-                [
-                    item[0] for item in result.Score
-                ],  # Extracting the year from each tuple
-                [
-                    item[1] for item in result.Score
-                ],  # Extracting the happiness score from each tuple
+                [item[0] for item in result.Score],
+                [item[1] for item in result.Score],
                 marker="o",
                 linestyle="-",
             )
@@ -172,41 +369,11 @@ class Window(Frame, threading.Thread):
             ax.set_ylabel("Happiness Score")
             ax.grid(True)
 
-            # Embed the plot into the window
             canvas = FigureCanvasTkAgg(fig, master=window)
             canvas.draw()
             canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
         window.mainloop()
-
-    # def show_message_box_Score(self, result):
-    #     window = tk.Toplevel()
-    #     window.title("Countries with Happiness Score")
-
-    #     text = tk.Text(window, wrap="word", height=20, width=50)
-    #     text.pack(side="left", fill="y", expand=True)
-
-    #     # Check if the list of countries is empty
-    #     if not result:
-    #         text.insert(tk.END, "This country does not exist")
-    #     else:
-    #         # Create a Scrollbar widget
-    #         scrollbar = tk.Scrollbar(window, command=text.yview)
-    #         scrollbar.pack(side="right", fill="y")
-    #         text.config(yscrollcommand=scrollbar.set)
-
-    #         # Insert the data into the Text widget
-    #         text.insert(
-    #             tk.END,
-    #             "\n".join(
-    #                 f"{item[0]} - Happiness Score: {item[1]}" for item in result.Country
-    #             ),
-    #         )
-
-    #         # Disable text editing
-    #         text.config(state=tk.DISABLED)
-
-    #     window.mainloop()
 
     def show_message_box_CountriesByAvgBbp(self, result):
         window = tk.Toplevel()
@@ -215,19 +382,15 @@ class Window(Frame, threading.Thread):
         text = tk.Text(window, wrap="word", height=20, width=50)
         text.pack(side="left", fill="y", expand=True)
 
-        # Check if the list of countries is empty
-        if not result.countries:
+        if not result.countries:  # kijken of de list niet leeg is
             text.insert(tk.END, "There is no country within this BBP range")
         else:
-            # Create a Scrollbar widget
             scrollbar = tk.Scrollbar(window, command=text.yview)
             scrollbar.pack(side="right", fill="y")
             text.config(yscrollcommand=scrollbar.set)
 
-            # Insert the data into the Text widget
             text.insert(tk.END, "\n".join(result.countries))
 
-            # Disable text editing
             text.config(state=tk.DISABLED)
 
     def show_message_box_Compare(self, result):
@@ -238,22 +401,18 @@ class Window(Frame, threading.Thread):
         text = tk.Text(window, wrap="word", height=20, width=50)
         text.pack(side="left", fill="y", expand=True)
 
-        # Check if the list of countries is empty
-        if not result.Comparison:
+        if not result.Comparison:  # kijken of de list niet leeg is
             text.insert(tk.END, "No data available for comparison.")
         else:
-            # Create a Scrollbar widget
             scrollbar = tk.Scrollbar(window, command=text.yview)
             scrollbar.pack(side="right", fill="y")
             text.config(yscrollcommand=scrollbar.set)
 
-            # Insert the data into the Text widget
             for item in result.Comparison:
                 text.insert(
                     tk.END, f"{item[0]} - Year: {item[1]}, Happiness Score: {item[2]}\n"
                 )
 
-            # Disable text editing
             text.config(state=tk.DISABLED)
 
         window.mainloop()
@@ -275,8 +434,8 @@ class Window(Frame, threading.Thread):
     def GetCountriesWithHappinesScore(self):
         try:
             logging.info("Get countries with happines score...")
-            happinesScoreMin = float(self.entry_happinesScoreMin.get())
-            happinesScoreMax = float(self.entry_happinesScoreMax.get())
+            happinesScoreMin = float(self.cmb_happinesScoreMin.get())
+            happinesScoreMax = float(self.cmb_happinesScoreMax.get())
 
             self.my_writer_obj.write(f"GetCountriesWithHappinesScore\n")
             data = GetCountriesHappines(happinesScoreMin, happinesScoreMax)
@@ -289,7 +448,7 @@ class Window(Frame, threading.Thread):
     def GetCountry(self):
         try:
             logging.info("Get country...")
-            country = self.entry_country.get()
+            country = self.cmb_country.get()
 
             self.my_writer_obj.write(f"GetCountry\n")
             data = GetCountriesScore(country)
@@ -303,8 +462,8 @@ class Window(Frame, threading.Thread):
     def GetCountriesWithBbp(self):
         try:
             logging.info("Get countries with BBP...")
-            bbpMin = float(self.entry_bbpMin.get())
-            bbpMax = float(self.entry_bbpMax.get())
+            bbpMin = float(self.cmb_bbpMin.get())
+            bbpMax = float(self.cmb_bbpMax.get())
 
             self.my_writer_obj.write(f"GetCountriesWithBbp\n")
             data = GetCountriesHappinesWithBbp(bbpMin, bbpMax)
@@ -317,8 +476,8 @@ class Window(Frame, threading.Thread):
     def Vergelijk2Landen(self):
         try:
             logging.info("Vergelijk 2 landen...")
-            country1 = self.entry_country1.get()
-            country2 = self.entry_country2.get()
+            country1 = self.cmb_country1.get()
+            country2 = self.cmb_country2.get()
 
             self.my_writer_obj.write(f"CompareCountries\n")
             data = Vergelijk2Landen(country1, country2)
@@ -344,7 +503,6 @@ class Window(Frame, threading.Thread):
             elif "CompareCountries" in commando:
                 result = jsonpickle.decode(data)
                 self.master.after(0, self.show_message_box_Compare, result)
-                # messagebox.showinfo("Comparison", result.Comparison)
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
 
