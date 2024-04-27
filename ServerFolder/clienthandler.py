@@ -9,6 +9,7 @@ import pandas as pd
 import uuid
 import datetime
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 from werkzeug import Client
 
@@ -48,6 +49,25 @@ class ClientHandler(threading.Thread):
                 self.bericht_servergui(f"Error: {e}")
         print(list(self.people_list))
 
+    def plot_country_happiness_evolution(self, country_name):
+
+        # Filter DataFrame for the specified country
+        country_data = self.dataset[self.dataset["Country"] == country_name]
+
+        # Plot the evolution of happiness score over the years
+        plt.figure(figsize=(10, 6))
+        plt.plot(
+            country_data["Year"],
+            country_data["Happiness Score"],
+            marker="o",
+            linestyle="-",
+        )
+        plt.title(f"Evolution of Happiness Score over the Years for {country_name}")
+        plt.xlabel("Year")
+        plt.ylabel("Happiness Score")
+        plt.grid(True)
+        plt.show()
+
     def run(self):
         io_stream_client = self.socketclient.makefile(mode="rw")
         print("Started & waiting...")
@@ -78,6 +98,13 @@ class ClientHandler(threading.Thread):
                         obj.BbpMin, obj.BbpMax
                     )
                     obj.countries = countries
+                elif commando == "CompareCountries":
+                    print("CompareCountries")
+                    obj = jsonpickle.decode(data)
+                    comparison = self.compare_countries_happiness(
+                        obj.Country1, obj.Country2
+                    )
+                    obj.Comparison = comparison
 
                 self.client_io_obj.write(commando + "\n")
                 self.client_io_obj.write(jsonpickle.encode(obj) + "\n")
@@ -141,3 +168,22 @@ class ClientHandler(threading.Thread):
         print(countries_within_avg_gdp_range)
 
         return countries_within_avg_gdp_range
+
+    def compare_countries_happiness(self, country1, country2):
+
+        # Filter DataFrame for the two countries
+        country1_data = self.dataset[self.dataset["Country"] == country1]
+        country2_data = self.dataset[self.dataset["Country"] == country2]
+
+        # Concatenate the data frames
+        comparison_df = pd.concat([country1_data, country2_data])
+
+        # Select only the desired columns
+        comparison_df = comparison_df[["Country", "Year", "Happiness Score"]]
+
+        # Convert DataFrame to list of tuples
+        comparison_list = comparison_df.values.tolist()
+
+        print(comparison_list)
+
+        return comparison_list
