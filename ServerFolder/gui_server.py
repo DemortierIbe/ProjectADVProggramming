@@ -39,11 +39,18 @@ class ServerWindow(Frame):
         self.lstnumbers.grid(row=1, column=0, sticky=N + S + E + W)
         self.scrollbar.grid(row=1, column=1, sticky=N + S)
 
+        self.scrollbar = Scrollbar(self, orient=VERTICAL)
+        self.lst_connectedclients = Listbox(self)
+        self.scrollbar.config(command=self.lst_connectedclients.yview)
+        self.lst_connectedclients.grid(row=2, column=0, sticky=N + S + E + W)
+        self.scrollbar.grid(row=2, column=1, sticky=N + S)
+
         self.btn_text = StringVar()
         self.btn_text.set("Start server")
         self.buttonServer = Button(
             self, textvariable=self.btn_text, command=self.start_stop_server
         )
+
         self.buttonServer.grid(
             row=3,
             column=0,
@@ -86,9 +93,15 @@ class ServerWindow(Frame):
 
     def print_messsages_from_queue(self):
         message = self.messages_queue.get()
+        previous_handlers = set()
         while message != "CLOSE_SERVER":
-            handler = self.server.get_online_users()
-            print(handler)
+            handlers = self.server.get_online_users()
+            new_handlers = [
+                handler for handler in handlers if handler not in previous_handlers
+            ]
+            for new_handler in new_handlers:
+                self.lst_connectedclients.insert(END, new_handler)
             self.lstnumbers.insert(END, message)
             self.messages_queue.task_done()
             message = self.messages_queue.get()
+            previous_handlers.update(handlers)

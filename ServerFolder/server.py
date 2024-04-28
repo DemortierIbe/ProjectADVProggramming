@@ -33,7 +33,6 @@ class Server(threading.Thread):
         self.host = host
         self.port = port
         self.messages_queue = messages_queue
-        self.dataset = Server.data_preprocessen(self)
 
     def data_preprocessen(self):
 
@@ -52,6 +51,7 @@ class Server(threading.Thread):
         self.serversocket.listen(5)
         self.__is_connected = True
         self.print_bericht_gui_server("SERVER STARTED")
+        self.dataset = self.data_preprocessen()
 
     def stop_server(self):
         if self.serversocket is not None:
@@ -75,8 +75,6 @@ class Server(threading.Thread):
                 self.print_bericht_gui_server(
                     f"Current Thread count: {threading.active_count()}."
                 )
-                self.print_bericht_gui_server("sending online users to GUI...")
-                self.print_bericht_gui_server(self.get_online_users())
 
         except Exception as ex:
             self.print_bericht_gui_server("Serversocket afgesloten")
