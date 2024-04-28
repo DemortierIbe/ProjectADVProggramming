@@ -14,6 +14,7 @@ from Data.GetCountriesHappines import GetCountriesHappines
 from Data.GetCountriesScore import GetCountriesScore
 from Data.GetCountriesHappinesWithBbp import GetCountriesHappinesWithBbp
 from Data.Vergelijk2Landen import Vergelijk2Landen
+from Data.UserLogin import UserLogin
 
 from tkinter import messagebox
 from tkinter import ttk
@@ -228,6 +229,21 @@ class Window(Frame, threading.Thread):
         self.start()
 
     def init_window(self):
+        self.master.withdraw()
+        self.top = tk.Toplevel()
+        self.top.title("Login")
+        self.top.geometry("300x200")
+        Label(self.top, text="Please enter your username and password").grid(row=0)
+        self.entry_username = Entry(self.top, width=20)
+        self.entry_password = Entry(self.top, width=20, show="*")
+        self.entry_username.grid(row=1, column=0, padx=(5, 5), pady=(5, 5))
+        self.entry_password.grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
+
+        self.requestbutton = Button(self.top, text="Login", command=self.login)
+        self.requestbutton.grid(row=3, column=0, padx=(5, 5), pady=(5, 5))
+
+        Grid.rowconfigure(self.top, 4, weight=1)
+        Grid.columnconfigure(self.top, 1, weight=1)
 
         self.master.title("Happines score")
         self.master.geometry("450x500")
@@ -503,8 +519,24 @@ class Window(Frame, threading.Thread):
             elif "CompareCountries" in commando:
                 result = jsonpickle.decode(data)
                 self.master.after(0, self.show_message_box_Compare, result)
+            elif "UserLogin" in commando:
+                result = jsonpickle.decode(data)
+                if result.succes:
+                    self.master.deiconify()
+                    self.top.destroy()
+                    self.top.update()
+                else:
+                    messagebox.showerror("Error", "Invalid username or password")
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
+
+    def login(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+        self.my_writer_obj.write(f"UserLogin\n")
+        data = UserLogin(username, password)
+        self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
+        self.my_writer_obj.flush()
 
 
 logging.basicConfig(level=logging.INFO)

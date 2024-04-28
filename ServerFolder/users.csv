@@ -1,0 +1,6 @@
+user,email,password,ScoreRangeOperaties,SearchCountryOperaties,BBPOperaties,CompareOperaties
+Ben,Ben@example.com,password1,5,8,3,7
+Joe,Joe@example.com,password2,7,6,4,9
+Marie,Marie@example.com,password3,6,9,5,8
+Stijn,Stijn@example.com,password4,8,7,6,9
+Thomas,Thomas@example.com,password5,9,5,7,8

@@ -10,6 +10,7 @@ import uuid
 import datetime
 from pathlib import Path
 import matplotlib.pyplot as plt
+import csv
 
 from werkzeug import Client
 
@@ -81,6 +82,16 @@ class ClientHandler(threading.Thread):
                         obj.Country1, obj.Country2
                     )
                     obj.Comparison = comparison
+
+                elif commando == "UserLogin":
+                    self.bericht_servergui("UserLogin")
+                    obj = jsonpickle.decode(data)
+                    if self.check_user_credentials(
+                        obj.username, obj.password, "users.csv"
+                    ):
+                        obj.succes = True
+                    else:
+                        obj.succes = False
 
                 self.client_io_obj.write(commando + "\n")
                 self.client_io_obj.write(jsonpickle.encode(obj) + "\n")
@@ -159,3 +170,11 @@ class ClientHandler(threading.Thread):
         comparison_list = comparison_df.values.tolist()
 
         return comparison_list
+
+    def check_user_credentials(self, username, password, csvfile):
+        with open(csvfile, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["user"] == username and row["password"] == password:
+                    return True
+        return False
