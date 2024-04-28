@@ -75,9 +75,18 @@ class Server(threading.Thread):
                 self.print_bericht_gui_server(
                     f"Current Thread count: {threading.active_count()}."
                 )
+                self.print_bericht_gui_server("sending online users to GUI...")
+                self.print_bericht_gui_server(self.get_online_users())
 
         except Exception as ex:
             self.print_bericht_gui_server("Serversocket afgesloten")
 
     def print_bericht_gui_server(self, message):
         self.messages_queue.put(f"Server:> {message}")
+
+    def get_online_users(self) -> list[ClientHandler]:
+        handlers = []
+        for handler in threading.enumerate():
+            if isinstance(handler, ClientHandler):
+                handlers.append(handler)
+        return handlers

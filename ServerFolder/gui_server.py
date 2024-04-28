@@ -87,6 +87,8 @@ class ServerWindow(Frame):
     def print_messsages_from_queue(self):
         message = self.messages_queue.get()
         while message != "CLOSE_SERVER":
+            handler = self.server.get_online_users()
+            print(handler)
             self.lstnumbers.insert(END, message)
             self.messages_queue.task_done()
             message = self.messages_queue.get()
