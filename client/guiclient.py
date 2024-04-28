@@ -233,31 +233,34 @@ class Window(Frame, threading.Thread):
         self.master.withdraw()
         self.top = tk.Toplevel()
         self.top.title("Login")
-        self.top.geometry("300x200")
+        self.top.geometry("300x250")
         Label(self.top, text="Please enter your username, email and password").grid(
             row=0, columnspan=2, padx=(5, 5), pady=(5, 5)
         )
+        Label(self.top, text="The Username and password is case sensitive").grid(
+            row=1, columnspan=2, padx=(5, 5), pady=(5, 5)
+        )
         Label(self.top, text="Username:").grid(
-            row=1, column=0, padx=(5, 5), pady=(5, 5)
+            row=2, column=0, padx=(5, 5), pady=(5, 5)
         )
         self.entry_username = Entry(self.top, width=20)
-        Label(self.top, text="Email:").grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
+        Label(self.top, text="Email:").grid(row=3, column=0, padx=(5, 5), pady=(5, 5))
         self.entry_email = Entry(self.top, width=20)
         Label(self.top, text="Password:").grid(
-            row=3, column=0, padx=(5, 5), pady=(5, 5)
+            row=4, column=0, padx=(5, 5), pady=(5, 5)
         )
         self.entry_password = Entry(self.top, width=20, show="*")
-        self.entry_username.grid(row=1, column=1, padx=(5, 5), pady=(5, 5))
-        self.entry_email.grid(row=2, column=1, padx=(5, 5), pady=(5, 5))
-        self.entry_password.grid(row=3, column=1, padx=(5, 5), pady=(5, 5))
+        self.entry_username.grid(row=2, column=1, padx=(5, 5), pady=(5, 5))
+        self.entry_email.grid(row=3, column=1, padx=(5, 5), pady=(5, 5))
+        self.entry_password.grid(row=4, column=1, padx=(5, 5), pady=(5, 5))
 
         self.requestbutton = Button(self.top, text="Login", command=self.login)
-        self.requestbutton.grid(row=4, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
-
-        self.requestbutton = Button(self.top, text="Register", command=self.register)
         self.requestbutton.grid(row=5, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
 
-        Grid.rowconfigure(self.top, 6, weight=1)
+        self.requestbutton = Button(self.top, text="Register", command=self.register)
+        self.requestbutton.grid(row=6, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
+
+        Grid.rowconfigure(self.top, 7, weight=1)
         Grid.columnconfigure(self.top, 2, weight=1)
 
         self.master.title("Happines score")
@@ -334,7 +337,11 @@ class Window(Frame, threading.Thread):
         self.cmb_country2.grid(row=13, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
         self.requestbutton = Button(self, text="search", command=self.Vergelijk2Landen)
         self.requestbutton.grid(row=14, column=0, padx=(5, 5), pady=(5, 5))
-        Grid.rowconfigure(self, 15, weight=1)
+
+        self.requestbutton = Button(self, text="Logout", command=self.Logout)
+        self.requestbutton.grid(row=15, column=0, padx=(5, 5), pady=(5, 5))
+
+        Grid.rowconfigure(self, 16, weight=1)
         Grid.columnconfigure(self, 1, weight=1)
 
     def show_message_box_CountriesByHappiness(self, result):
@@ -518,6 +525,10 @@ class Window(Frame, threading.Thread):
         except Exception as ex:
             logging.error(f"Foutmelding: {ex}")
 
+    def Logout(self):
+        self.master.withdraw()
+        self.top.deiconify()
+
     def run(self):
         commando = self.my_writer_obj.readline().rstrip()
         data = self.my_writer_obj.readline().rstrip()
@@ -538,8 +549,7 @@ class Window(Frame, threading.Thread):
                 result = jsonpickle.decode(data)
                 if result.succes:
                     self.master.deiconify()
-                    self.top.destroy()
-                    self.top.update()
+                    self.top.withdraw()
                 else:
                     messagebox.showerror("Error", "Invalid username or password")
             elif "UserRegister" in commando:
@@ -555,6 +565,7 @@ class Window(Frame, threading.Thread):
         username = self.entry_username.get()
         password = self.entry_password.get()
         email = self.entry_email.get()
+        email = email.lower()
         self.my_writer_obj.write(f"UserLogin\n")
         data = UserLogin(username, password, email)
         self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
@@ -564,6 +575,7 @@ class Window(Frame, threading.Thread):
         username = self.entry_username.get()
         password = self.entry_password.get()
         email = self.entry_email.get()
+        email = email.lower()
         self.my_writer_obj.write(f"UserRegister\n")
         data = UserLogin(username, password, email)
         self.my_writer_obj.write(jsonpickle.encode(data) + "\n")

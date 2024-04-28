@@ -2,6 +2,7 @@ import os
 import pickle
 import sys
 import threading
+from tkinter import messagebox
 import jsonpickle
 import hashlib
 import numpy as np
@@ -189,6 +190,9 @@ class ClientHandler(threading.Thread):
                     return True
         return False
 
+    def is_valid_email(self, email):
+        return "@" in email and "." in email
+
     def email_exists_in_csv(self, email, csvfile):
         with open(csvfile, "r", newline="") as file:
             reader = csv.DictReader(file)
@@ -198,6 +202,10 @@ class ClientHandler(threading.Thread):
         return False
 
     def add_user_to_csv(self, username, email, password, csvfile):
+        # controleren als het email valid is
+        if not self.is_valid_email(email):
+            messagebox.showerror("Error", "Invalid email format.")
+            return False
         # controleren als ge gebruiker al bestaat
         if self.email_exists_in_csv(email, csvfile):
             return False
