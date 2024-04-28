@@ -254,7 +254,10 @@ class Window(Frame, threading.Thread):
         self.requestbutton = Button(self.top, text="Login", command=self.login)
         self.requestbutton.grid(row=4, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
 
-        Grid.rowconfigure(self.top, 5, weight=1)
+        self.requestbutton = Button(self.top, text="Register", command=self.register)
+        self.requestbutton.grid(row=5, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
+
+        Grid.rowconfigure(self.top, 6, weight=1)
         Grid.columnconfigure(self.top, 2, weight=1)
 
         self.master.title("Happines score")
@@ -539,6 +542,12 @@ class Window(Frame, threading.Thread):
                     self.top.update()
                 else:
                     messagebox.showerror("Error", "Invalid username or password")
+            elif "UserRegister" in commando:
+                result = jsonpickle.decode(data)
+                if result.succes:
+                    messagebox.showinfo("Success", "User registered successfully")
+                else:
+                    messagebox.showerror("Error", "User already exists")
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
 
@@ -547,6 +556,15 @@ class Window(Frame, threading.Thread):
         password = self.entry_password.get()
         email = self.entry_email.get()
         self.my_writer_obj.write(f"UserLogin\n")
+        data = UserLogin(username, password, email)
+        self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
+        self.my_writer_obj.flush()
+
+    def register(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+        email = self.entry_email.get()
+        self.my_writer_obj.write(f"UserRegister\n")
         data = UserLogin(username, password, email)
         self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
         self.my_writer_obj.flush()

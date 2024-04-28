@@ -92,6 +92,12 @@ class ClientHandler(threading.Thread):
                         obj.succes = True
                     else:
                         obj.succes = False
+                elif commando == "UserRegister":
+                    self.bericht_servergui("UserRegister")
+                    obj = jsonpickle.decode(data)
+                    obj.succes = self.add_user_to_csv(
+                        obj.username, obj.email, obj.password, "users.csv"
+                    )
 
                 self.client_io_obj.write(commando + "\n")
                 self.client_io_obj.write(jsonpickle.encode(obj) + "\n")
@@ -182,3 +188,42 @@ class ClientHandler(threading.Thread):
                 ):
                     return True
         return False
+
+    def email_exists_in_csv(self, email, csvfile):
+        with open(csvfile, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["email"] == email:
+                    return True
+        return False
+
+    def add_user_to_csv(self, username, email, password, csvfile):
+        # controleren als ge gebruiker al bestaat
+        if self.email_exists_in_csv(email, csvfile):
+            return False
+
+        fieldnames = [
+            "user",
+            "email",
+            "password",
+            "ScoreRangeOperaties",
+            "SearchCountryOperaties",
+            "BBPOperaties",
+            "CompareOperaties",
+        ]
+        new_user_data = {
+            "user": username,
+            "email": email,
+            "password": password,
+            "ScoreRangeOperaties": "0",
+            "SearchCountryOperaties": "0",
+            "BBPOperaties": "0",
+            "CompareOperaties": "0",
+        }
+        with open(csvfile, "a", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            # als de file leeg is headers toevoegen
+            if file.tell() == 0:
+                writer.writeheader()
+            writer.writerow(new_user_data)
+        return True
