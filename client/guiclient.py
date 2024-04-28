@@ -229,21 +229,33 @@ class Window(Frame, threading.Thread):
         self.start()
 
     def init_window(self):
+        # login window
         self.master.withdraw()
         self.top = tk.Toplevel()
         self.top.title("Login")
         self.top.geometry("300x200")
-        Label(self.top, text="Please enter your username and password").grid(row=0)
+        Label(self.top, text="Please enter your username, email and password").grid(
+            row=0, columnspan=2, padx=(5, 5), pady=(5, 5)
+        )
+        Label(self.top, text="Username:").grid(
+            row=1, column=0, padx=(5, 5), pady=(5, 5)
+        )
         self.entry_username = Entry(self.top, width=20)
+        Label(self.top, text="Email:").grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
+        self.entry_email = Entry(self.top, width=20)
+        Label(self.top, text="Password:").grid(
+            row=3, column=0, padx=(5, 5), pady=(5, 5)
+        )
         self.entry_password = Entry(self.top, width=20, show="*")
-        self.entry_username.grid(row=1, column=0, padx=(5, 5), pady=(5, 5))
-        self.entry_password.grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
+        self.entry_username.grid(row=1, column=1, padx=(5, 5), pady=(5, 5))
+        self.entry_email.grid(row=2, column=1, padx=(5, 5), pady=(5, 5))
+        self.entry_password.grid(row=3, column=1, padx=(5, 5), pady=(5, 5))
 
         self.requestbutton = Button(self.top, text="Login", command=self.login)
-        self.requestbutton.grid(row=3, column=0, padx=(5, 5), pady=(5, 5))
+        self.requestbutton.grid(row=4, column=0, padx=(5, 5), pady=(5, 5), columnspan=2)
 
-        Grid.rowconfigure(self.top, 4, weight=1)
-        Grid.columnconfigure(self.top, 1, weight=1)
+        Grid.rowconfigure(self.top, 5, weight=1)
+        Grid.columnconfigure(self.top, 2, weight=1)
 
         self.master.title("Happines score")
         self.master.geometry("450x500")
@@ -533,8 +545,9 @@ class Window(Frame, threading.Thread):
     def login(self):
         username = self.entry_username.get()
         password = self.entry_password.get()
+        email = self.entry_email.get()
         self.my_writer_obj.write(f"UserLogin\n")
-        data = UserLogin(username, password)
+        data = UserLogin(username, password, email)
         self.my_writer_obj.write(jsonpickle.encode(data) + "\n")
         self.my_writer_obj.flush()
 

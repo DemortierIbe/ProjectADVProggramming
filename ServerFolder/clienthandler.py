@@ -87,7 +87,7 @@ class ClientHandler(threading.Thread):
                     self.bericht_servergui("UserLogin")
                     obj = jsonpickle.decode(data)
                     if self.check_user_credentials(
-                        obj.username, obj.password, "users.csv"
+                        obj.username, obj.email, obj.password, "users.csv"
                     ):
                         obj.succes = True
                     else:
@@ -171,10 +171,14 @@ class ClientHandler(threading.Thread):
 
         return comparison_list
 
-    def check_user_credentials(self, username, password, csvfile):
+    def check_user_credentials(self, username, email, password, csvfile):
         with open(csvfile, "r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
-                if row["user"] == username and row["password"] == password:
+                if (
+                    row["user"] == username
+                    and row["email"] == email
+                    and row["password"] == password
+                ):
                     return True
         return False
