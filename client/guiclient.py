@@ -557,7 +557,9 @@ class Window(Frame, threading.Thread):
                 if result.succes:
                     messagebox.showinfo("Success", "User registered successfully")
                 else:
-                    messagebox.showerror("Error", "User already exists")
+                    messagebox.showerror(
+                        "Error", "User already exists or the email is invalid"
+                    )
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
 

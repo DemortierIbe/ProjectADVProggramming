@@ -204,7 +204,6 @@ class ClientHandler(threading.Thread):
     def add_user_to_csv(self, username, email, password, csvfile):
         # controleren als het email valid is
         if not self.is_valid_email(email):
-            messagebox.showerror("Error", "Invalid email format.")
             return False
         # controleren als ge gebruiker al bestaat
         if self.email_exists_in_csv(email, csvfile):
