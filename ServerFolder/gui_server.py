@@ -52,6 +52,19 @@ class ServerWindow(Frame):
         self.lst_showallclients.grid(row=3, column=0, sticky=N + S + E + W)
         self.scrollbar.grid(row=3, column=1, sticky=N + S)
 
+        self.lbl_scorerangeoperaties = Label(
+            self, text="Scorerange operaties: {}"
+        ).grid(row=4, column=0)
+        self.lbl_searchcountryoperaties = Label(
+            self, text="Searchcountry operaties: {}"
+        ).grid(row=5, column=0)
+        self.lbl_bbpoperaties = Label(self, text="Bbp operaties: {}").grid(
+            row=6, column=0
+        )
+        self.lbl_compareoperaties = Label(self, text="Compare operaties: {}").grid(
+            row=7, column=0
+        )
+
         self.btn_text = StringVar()
         self.btn_text.set("Start server")
         self.buttonServer = Button(
@@ -59,7 +72,7 @@ class ServerWindow(Frame):
         )
 
         self.buttonServer.grid(
-            row=4,
+            row=8,
             column=0,
             columnspan=2,
             pady=(5, 5),
@@ -110,8 +123,26 @@ class ServerWindow(Frame):
             self.lst_showallclients.delete(0, END)
             for user in usersinfo:
                 self.lst_showallclients.insert(END, user)
-            print(self.server.get_user_data_from_csv("users.csv"))
+            self.update_operaties_sum()
             self.lstnumbers.insert(END, message)
             self.messages_queue.task_done()
             message = self.messages_queue.get()
             previous_handlers.update(handlers)
+
+    def update_operaties_sum(self):
+        self.lbl_scorerangeoperaties = Label(
+            self,
+            text=f"Scorerange operaties: {str(self.server.get_sum_score_range_operaties('users.csv'))}",
+        ).grid(row=4, column=0)
+        self.lbl_searchcountryoperaties = Label(
+            self,
+            text=f"Searchcountry operaties: {str(self.server.get_sum_search_country_operaties('users.csv'))}",
+        ).grid(row=5, column=0)
+        self.lbl_bbpoperaties = Label(
+            self,
+            text=f"Bbp operaties: {str(self.server.get_sum_bbp_operaties('users.csv'))}",
+        ).grid(row=6, column=0)
+        self.lbl_compareoperaties = Label(
+            self,
+            text=f"Compare operaties: {str(self.server.get_sum_compare_operaties('users.csv'))}",
+        ).grid(row=7, column=0)
