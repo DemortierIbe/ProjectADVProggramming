@@ -1,3 +1,4 @@
+import csv
 import os
 import pandas as pd
 import sys
@@ -88,3 +89,46 @@ class Server(threading.Thread):
             if isinstance(handler, ClientHandler):
                 handlers.append(handler)
         return handlers
+
+    def get_user_data_from_csv(self, csvfile):
+        user_data_list = []
+        with open(csvfile, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                user_data = {
+                    "user": row["user"],
+                    "ScoreRangeOperaties": int(row["ScoreRangeOperaties"]),
+                    "SearchCountryOperaties": int(row["SearchCountryOperaties"]),
+                    "BBPOperaties": int(row["BBPOperaties"]),
+                    "CompareOperaties": int(row["CompareOperaties"]),
+                }
+                user_data_list.append(user_data)
+        return user_data_list
+
+    def get_sum_score_range_operaties(self, csvfile):
+        sum_score_range_operaties = 0
+        user_data_list = self.get_user_data_from_csv(csvfile)
+        for user_data in user_data_list:
+            sum_score_range_operaties += user_data["ScoreRangeOperaties"]
+        return sum_score_range_operaties
+
+    def get_sum_search_country_operaties(self, csvfile):
+        sum_search_country_operaties = 0
+        user_data_list = self.get_user_data_from_csv(csvfile)
+        for user_data in user_data_list:
+            sum_search_country_operaties += user_data["SearchCountryOperaties"]
+        return sum_search_country_operaties
+
+    def get_sum_bbp_operaties(self, csvfile):
+        sum_bbp_operaties = 0
+        user_data_list = self.get_user_data_from_csv(csvfile)
+        for user_data in user_data_list:
+            sum_bbp_operaties += user_data["BBPOperaties"]
+        return sum_bbp_operaties
+
+    def get_sum_compare_operaties(self, csvfile):
+        sum_compare_operaties = 0
+        user_data_list = self.get_user_data_from_csv(csvfile)
+        for user_data in user_data_list:
+            sum_compare_operaties += user_data["CompareOperaties"]
+        return sum_compare_operaties
