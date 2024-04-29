@@ -224,8 +224,15 @@ class Window(Frame, threading.Thread):
         Frame.__init__(self, master)
         threading.Thread.__init__(self)
         self.master = master
+        while True:
+            try:
+                if self.makeConnnectionWithServer():
+                    break
+            except Exception as ex:
+                logging.error(f"Foutmelding: {ex}")
+                messagebox.showerror("Error", "Could not connect to server")
         self.init_window()
-        self.makeConnnectionWithServer()
+        
         self.start()
 
     def init_window(self):
@@ -466,6 +473,7 @@ class Window(Frame, threading.Thread):
             self.socket_to_server.connect((host, port))
             self.my_writer_obj = self.socket_to_server.makefile(mode="rw")
             logging.info("Open connection with server succesfully")
+            return True
         except Exception as ex:
             logging.error(f"Foutmelding: {ex}")
 
