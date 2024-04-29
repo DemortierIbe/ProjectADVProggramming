@@ -152,7 +152,7 @@ class ClientHandler(threading.Thread):
         filtered_df = filtered_df[["Year", "Happiness Score"]]
 
         score_per_year = [
-            (row["Year"], row["Happiness Score"])
+            (int(row["Year"]), row["Happiness Score"])
             for index, row in filtered_df.iterrows()
         ]
         self.bericht_servergui("search success")

@@ -277,24 +277,15 @@ class Window(Frame, threading.Thread):
 
         # zoeken naar landen tussen een happines range
         Label(
-            self, text="Geef de range van happines score waartussen u wil zoeken:"
+            self, text="Give the range of happiness score you want to search for:"
         ).grid(row=0)
 
-        self.cmb_happinesScoreMin = Combobox(
-            self, state="readonly", values=score_range, width=20
-        )
-        self.cmb_happinesScoreMax = Combobox(
-            self, state="readonly", values=score_range, width=20
-        )
-        self.cmb_happinesScoreMin.current(0)
-        self.cmb_happinesScoreMax.current(1)
+        self.spinboxscorerangeMin = Spinbox(self, from_=0, to=10, increment=0.5, width=20)
+        self.spinboxscorerangeMin.grid(row=1, column=0, padx=(5, 5), pady=(5, 5))
 
-        self.cmb_happinesScoreMin.grid(
-            row=1, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5)
-        )
-        self.cmb_happinesScoreMax.grid(
-            row=2, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0)
-        )
+        self.spinboxscorerangeMax  = Spinbox(self, from_=0, to=10, increment=0.5, width=20)
+        self.spinboxscorerangeMax.grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
+
 
         self.requestbutton = Button(
             self, text="Search", command=self.GetCountriesWithHappinesScore
@@ -302,12 +293,12 @@ class Window(Frame, threading.Thread):
         self.requestbutton.grid(row=3, column=0, padx=(5, 5), pady=(5, 5))
 
         # land opzoeken om gelukscore te zien
-        Label(self, text="Geef een land in om de happines score te zien:").grid(row=4)
+        Label(self, text="Please provide a country to see its happiness score:").grid(row=4)
         self.cmb_country = Combobox(
             self, state="readonly", values=All_Countries, width=20
         )
         self.cmb_country.current(0)
-        self.cmb_country.grid(row=5, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
+        self.cmb_country.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
 
         self.requestbutton = Button(self, text="Search", command=self.GetCountry)
         self.requestbutton.grid(row=6, column=0, padx=(5, 5), pady=(5, 5))
@@ -315,22 +306,27 @@ class Window(Frame, threading.Thread):
         # landen tussen een bepaalde range van BBP
         Label(
             self,
-            text="Geef de range van de BBP invloed op de happines score waartussen u wil zoeken:",
+            text="Provide the range of GDP influence on the happiness score you want to search for.:",
         ).grid(row=7)
 
-        self.cmb_bbpMin = Combobox(self, state="readonly", values=Bbp_range, width=20)
-        self.cmb_bbpMax = Combobox(self, state="readonly", values=Bbp_range, width=20)
-        self.cmb_bbpMin.current(0)
-        self.cmb_bbpMax.current(1)
-        self.cmb_bbpMin.grid(row=8, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
-        self.cmb_bbpMax.grid(row=9, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
+        self.spinbox_bbpMin = Spinbox(self, from_=0, to=2, increment=0.1, width=20)
+        self.spinbox_bbpMax = Spinbox(self, from_=0, to=2, increment=0.1, width=20)
+        self.spinbox_bbpMin.grid(row=8, column=0, padx=(5, 5), pady=(5, 5))
+        self.spinbox_bbpMax.grid(row=9, column=0, padx=(5, 5), pady=(5, 0))
+
+        # self.cmb_bbpMin = Combobox(self, state="readonly", values=Bbp_range, width=20)
+        # self.cmb_bbpMax = Combobox(self, state="readonly", values=Bbp_range, width=20)
+        # self.cmb_bbpMin.current(0)
+        # self.cmb_bbpMax.current(1)
+        # self.cmb_bbpMin.grid(row=8, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
+        # self.cmb_bbpMax.grid(row=9, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
         self.requestbutton = Button(
             self, text="search", command=self.GetCountriesWithBbp
         )
         self.requestbutton.grid(row=10, column=0, padx=(5, 5), pady=(5, 5))
 
         # 2 landen opzoeken om te vergelijken
-        Label(self, text="Geef 2 landen die u wilt vergelijken:").grid(row=11)
+        Label(self, text="Provide two countries you would like to compare:").grid(row=11)
 
         self.cmb_country1 = Combobox(
             self, state="readonly", values=All_Countries, width=20
@@ -340,8 +336,8 @@ class Window(Frame, threading.Thread):
         )
         self.cmb_country1.current(0)
         self.cmb_country2.current(1)
-        self.cmb_country1.grid(row=12, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
-        self.cmb_country2.grid(row=13, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
+        self.cmb_country1.grid(row=12, column=0, padx=(5, 5), pady=(5, 5))
+        self.cmb_country2.grid(row=13, column=0, padx=(5, 5), pady=(5, 0))
         self.requestbutton = Button(self, text="search", command=self.Vergelijk2Landen)
         self.requestbutton.grid(row=14, column=0, padx=(5, 5), pady=(5, 5))
 
@@ -480,8 +476,8 @@ class Window(Frame, threading.Thread):
     def GetCountriesWithHappinesScore(self):
         try:
             logging.info("Get countries with happines score...")
-            happinesScoreMin = float(self.cmb_happinesScoreMin.get())
-            happinesScoreMax = float(self.cmb_happinesScoreMax.get())
+            happinesScoreMin = float(self.spinboxscorerangeMin.get())
+            happinesScoreMax = float(self.spinboxscorerangeMax.get())
 
             self.my_writer_obj.write(f"GetCountriesWithHappinesScore\n")
             data = GetCountriesHappines(happinesScoreMin, happinesScoreMax)
@@ -508,8 +504,8 @@ class Window(Frame, threading.Thread):
     def GetCountriesWithBbp(self):
         try:
             logging.info("Get countries with BBP...")
-            bbpMin = float(self.cmb_bbpMin.get())
-            bbpMax = float(self.cmb_bbpMax.get())
+            bbpMin = float(self.spinbox_bbpMin.get())
+            bbpMax = float(self.spinbox_bbpMax.get())
 
             self.my_writer_obj.write(f"GetCountriesWithBbp\n")
             data = GetCountriesHappinesWithBbp(bbpMin, bbpMax)
