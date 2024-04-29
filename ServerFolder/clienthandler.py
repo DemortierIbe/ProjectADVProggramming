@@ -57,7 +57,9 @@ class ClientHandler(threading.Thread):
                 if commando == "GetCountriesWithHappinesScore":
                     self.bericht_servergui("GetCountriesWithHappinesScore")
                     obj = jsonpickle.decode(data)
-
+                    self.increment_operation_count(
+                        ingelogde_user, "ScoreRangeOperaties", "users.csv"
+                    )
                     countries = self.search_countries_by_happiness_score(
                         obj.HappinessMin, obj.HappinessMax
                     )
@@ -66,12 +68,18 @@ class ClientHandler(threading.Thread):
                 elif commando == "GetCountry":
                     self.bericht_servergui("GetCountry")
                     obj = jsonpickle.decode(data)
+                    self.increment_operation_count(
+                        ingelogde_user, "SearchCountryOperaties", "users.csv"
+                    )
                     score = self.search_country_by_name(obj.Country)
                     obj.Score = score
 
                 elif commando == "GetCountriesWithBbp":
                     self.bericht_servergui("GetCountriesWithBbp")
                     obj = jsonpickle.decode(data)
+                    self.increment_operation_count(
+                        ingelogde_user, "BBPOperaties", "users.csv"
+                    )
                     countries = self.search_countries_by_avg_gdp_range(
                         obj.BbpMin, obj.BbpMax
                     )
@@ -79,6 +87,9 @@ class ClientHandler(threading.Thread):
                 elif commando == "CompareCountries":
                     self.bericht_servergui("CompareCountries")
                     obj = jsonpickle.decode(data)
+                    self.increment_operation_count(
+                        ingelogde_user, "CompareOperaties", "users.csv"
+                    )
                     comparison = self.compare_countries_happiness(
                         obj.Country1, obj.Country2
                     )
@@ -87,6 +98,7 @@ class ClientHandler(threading.Thread):
                 elif commando == "UserLogin":
                     self.bericht_servergui("UserLogin")
                     obj = jsonpickle.decode(data)
+                    ingelogde_user = obj.username
                     if self.check_user_credentials(
                         obj.username, obj.email, obj.password, "users.csv"
                     ):
@@ -129,6 +141,7 @@ class ClientHandler(threading.Thread):
             (average_scores_per_country >= min_score)
             & (average_scores_per_country <= max_score)
         ]
+        self.bericht_servergui("search success")
 
         return filtered_countries.index.tolist()
 
@@ -142,6 +155,7 @@ class ClientHandler(threading.Thread):
             (row["Year"], row["Happiness Score"])
             for index, row in filtered_df.iterrows()
         ]
+        self.bericht_servergui("search success")
 
         return score_per_year
 
@@ -161,6 +175,7 @@ class ClientHandler(threading.Thread):
 
         # namen van de landen in een list steken
         countries_within_avg_gdp_range = filtered_countries.index.tolist()
+        self.bericht_servergui("search success")
 
         return countries_within_avg_gdp_range
 
@@ -175,6 +190,7 @@ class ClientHandler(threading.Thread):
         comparison_df = comparison_df[["Country", "Year", "Happiness Score"]]
 
         comparison_list = comparison_df.values.tolist()
+        self.bericht_servergui("search success")
 
         return comparison_list
 
@@ -234,3 +250,34 @@ class ClientHandler(threading.Thread):
                 writer.writeheader()
             writer.writerow(new_user_data)
         return True
+
+    def increment_operation_count(self, username, operation_name, csvfile):
+        # Define the fieldnames for reading and writing
+        fieldnames = [
+            "user",
+            "email",
+            "password",
+            "ScoreRangeOperaties",
+            "SearchCountryOperaties",
+            "BBPOperaties",
+            "CompareOperaties",
+        ]
+
+        # Read the CSV file and store data in a list of dictionaries
+        user_data_list = []
+        with open(csvfile, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                user_data_list.append(row)
+
+        # Find the user in the list and increment the count of the specified operation
+        for user_data in user_data_list:
+            if user_data["user"] == username:
+                user_data[operation_name] = str(int(user_data[operation_name]) + 1)
+                break
+
+        # Write the updated data back to the CSV file
+        with open(csvfile, "w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(user_data_list)

@@ -4,8 +4,8 @@ Joe,joe@example.com,password2,7,6,4,9
 Marie,marie@example.com,password3,6,9,5,8
 Stijn,stijn@example.com,password4,8,7,6,9
 Thomas,thomas@example.com,password5,9,5,7,8
-Ibe,ibe@example.com,password,0,0,0,0
-Britt,britt@example.com,password1,0,0,0,0
+Ibe,ibe@example.com,password,6,7,4,0
+Britt,britt@example.com,password1,1,0,0,0
 Jos,jos@example.com,password,0,0,0,0
 Louis,louis@example.com,password,0,0,0,0
 Pedro,pedro@example.com,password,0,0,0,0
