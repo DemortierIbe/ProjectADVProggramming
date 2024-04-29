@@ -1,3 +1,4 @@
+import csv
 import os
 import pandas as pd
 import sys
@@ -88,3 +89,18 @@ class Server(threading.Thread):
             if isinstance(handler, ClientHandler):
                 handlers.append(handler)
         return handlers
+
+    def get_user_data_from_csv(self, csvfile):
+        user_data_list = []
+        with open(csvfile, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                user_data = {
+                    "user": row["user"],
+                    "ScoreRangeOperaties": int(row["ScoreRangeOperaties"]),
+                    "SearchCountryOperaties": int(row["SearchCountryOperaties"]),
+                    "BBPOperaties": int(row["BBPOperaties"]),
+                    "CompareOperaties": int(row["CompareOperaties"]),
+                }
+                user_data_list.append(user_data)
+        return user_data_list

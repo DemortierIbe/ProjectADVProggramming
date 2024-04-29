@@ -27,6 +27,7 @@ class ServerWindow(Frame):
     def init_window(self):
         # changing the title of our master widget
         self.master.title("Server")
+        self.master.geometry("700x600")
 
         # allowing the widget to take the full space of the root window
         self.pack(fill=BOTH, expand=1)
@@ -45,6 +46,12 @@ class ServerWindow(Frame):
         self.lst_connectedclients.grid(row=2, column=0, sticky=N + S + E + W)
         self.scrollbar.grid(row=2, column=1, sticky=N + S)
 
+        self.scrollbar = Scrollbar(self, orient=VERTICAL)
+        self.lst_showallclients = Listbox(self)
+        self.scrollbar.config(command=self.lst_showallclients.yview)
+        self.lst_showallclients.grid(row=3, column=0, sticky=N + S + E + W)
+        self.scrollbar.grid(row=3, column=1, sticky=N + S)
+
         self.btn_text = StringVar()
         self.btn_text.set("Start server")
         self.buttonServer = Button(
@@ -52,7 +59,7 @@ class ServerWindow(Frame):
         )
 
         self.buttonServer.grid(
-            row=3,
+            row=4,
             column=0,
             columnspan=2,
             pady=(5, 5),
@@ -95,12 +102,15 @@ class ServerWindow(Frame):
         message = self.messages_queue.get()
         previous_handlers = set()
         while message != "CLOSE_SERVER":
+            self.lst_connectedclients.delete(0, END)
             handlers = self.server.get_online_users()
-            new_handlers = [
-                handler for handler in handlers if handler not in previous_handlers
-            ]
-            for new_handler in new_handlers:
-                self.lst_connectedclients.insert(END, new_handler)
+            for handler in handlers:
+                self.lst_connectedclients.insert(END, handler)
+            usersinfo = self.server.get_user_data_from_csv("users.csv")
+            self.lst_showallclients.delete(0, END)
+            for user in usersinfo:
+                self.lst_showallclients.insert(END, user)
+            print(self.server.get_user_data_from_csv("users.csv"))
             self.lstnumbers.insert(END, message)
             self.messages_queue.task_done()
             message = self.messages_queue.get()
