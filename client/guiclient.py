@@ -314,12 +314,7 @@ class Window(Frame, threading.Thread):
         self.spinbox_bbpMin.grid(row=8, column=0, padx=(5, 5), pady=(5, 5))
         self.spinbox_bbpMax.grid(row=9, column=0, padx=(5, 5), pady=(5, 0))
 
-        # self.cmb_bbpMin = Combobox(self, state="readonly", values=Bbp_range, width=20)
-        # self.cmb_bbpMax = Combobox(self, state="readonly", values=Bbp_range, width=20)
-        # self.cmb_bbpMin.current(0)
-        # self.cmb_bbpMax.current(1)
-        # self.cmb_bbpMin.grid(row=8, column=0, sticky=E + W, padx=(5, 5), pady=(5, 5))
-        # self.cmb_bbpMax.grid(row=9, column=0, sticky=E + W, padx=(5, 5), pady=(5, 0))
+        
         self.requestbutton = Button(
             self, text="search", command=self.GetCountriesWithBbp
         )
