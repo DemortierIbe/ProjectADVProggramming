@@ -28,7 +28,7 @@ from tkinter import ttk
 import threading
 
 
-All_Countries = [
+list_all_Countries = [
     "Afghanistan",
     "Albania",
     "Algeria",
@@ -178,6 +178,7 @@ class Window(Frame, threading.Thread):
         Frame.__init__(self, master)
         threading.Thread.__init__(self)
         self.master = master
+        messagebox.showinfo("Wait", "Waiting for server connection")
         while True:
             try:
                 if self.makeConnnectionWithServer():
@@ -249,7 +250,7 @@ class Window(Frame, threading.Thread):
         # land opzoeken om gelukscore te zien
         Label(self, text="Please provide a country to see its happiness score:").grid(row=4)
         self.cmb_country = Combobox(
-            self, state="readonly", values=All_Countries, width=20
+            self, state="readonly", values=list_all_Countries, width=20
         )
         self.cmb_country.current(0)
         self.cmb_country.grid(row=5, column=0, padx=(5, 5), pady=(5, 5))
@@ -278,10 +279,10 @@ class Window(Frame, threading.Thread):
         Label(self, text="Provide two countries you would like to compare:").grid(row=11)
 
         self.cmb_country1 = Combobox(
-            self, state="readonly", values=All_Countries, width=20
+            self, state="readonly", values=list_all_Countries, width=20
         )
         self.cmb_country2 = Combobox(
-            self, state="readonly", values=All_Countries, width=20
+            self, state="readonly", values=list_all_Countries, width=20
         )
         self.cmb_country1.current(0)
         self.cmb_country2.current(1)
