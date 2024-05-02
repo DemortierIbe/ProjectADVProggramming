@@ -172,13 +172,13 @@ list_all_Countries = [
 ]
 
 
-
 class Window(Frame, threading.Thread):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         threading.Thread.__init__(self)
         self.master = master
-        messagebox.showinfo("Wait", "Waiting for server connection")
+        if not self.makeConnnectionWithServer():
+            messagebox.showinfo("Wait", "Waiting for server connection")
         while True:
             try:
                 if self.makeConnnectionWithServer():
@@ -187,7 +187,7 @@ class Window(Frame, threading.Thread):
                 logging.error(f"Foutmelding: {ex}")
                 messagebox.showerror("Error", "Could not connect to server")
         self.init_window()
-        
+
         self.start()
 
     def init_window(self):
@@ -235,12 +235,15 @@ class Window(Frame, threading.Thread):
             self, text="Give the range of happiness score you want to search for:"
         ).grid(row=0)
 
-        self.spinboxscorerangeMin = Spinbox(self, from_=0, to=10, increment=0.5, width=20)
+        self.spinboxscorerangeMin = Spinbox(
+            self, from_=0, to=10, increment=0.5, width=20
+        )
         self.spinboxscorerangeMin.grid(row=1, column=0, padx=(5, 5), pady=(5, 5))
 
-        self.spinboxscorerangeMax  = Spinbox(self, from_=0, to=10, increment=0.5, width=20)
+        self.spinboxscorerangeMax = Spinbox(
+            self, from_=0, to=10, increment=0.5, width=20
+        )
         self.spinboxscorerangeMax.grid(row=2, column=0, padx=(5, 5), pady=(5, 5))
-
 
         self.requestbutton = Button(
             self, text="Search", command=self.GetCountriesWithHappinesScore
@@ -248,7 +251,9 @@ class Window(Frame, threading.Thread):
         self.requestbutton.grid(row=3, column=0, padx=(5, 5), pady=(5, 5))
 
         # land opzoeken om gelukscore te zien
-        Label(self, text="Please provide a country to see its happiness score:").grid(row=4)
+        Label(self, text="Please provide a country to see its happiness score:").grid(
+            row=4
+        )
         self.cmb_country = Combobox(
             self, state="readonly", values=list_all_Countries, width=20
         )
@@ -269,14 +274,15 @@ class Window(Frame, threading.Thread):
         self.spinbox_bbpMin.grid(row=8, column=0, padx=(5, 5), pady=(5, 5))
         self.spinbox_bbpMax.grid(row=9, column=0, padx=(5, 5), pady=(5, 0))
 
-        
         self.requestbutton = Button(
             self, text="search", command=self.GetCountriesWithBbp
         )
         self.requestbutton.grid(row=10, column=0, padx=(5, 5), pady=(5, 5))
 
         # 2 landen opzoeken om te vergelijken
-        Label(self, text="Provide two countries you would like to compare:").grid(row=11)
+        Label(self, text="Provide two countries you would like to compare:").grid(
+            row=11
+        )
 
         self.cmb_country1 = Combobox(
             self, state="readonly", values=list_all_Countries, width=20

@@ -91,6 +91,7 @@ class ServerWindow(Frame):
 
     def __stop_server(self):
         self.server.stop_server()
+        self.messages_queue.put("CLOSE_SERVER")
         self.server = None
         logging.info("Server stopped")
         self.btn_text.set("Start server")
@@ -99,6 +100,8 @@ class ServerWindow(Frame):
         self.server = Server(socket.gethostname(), 9999, self.messages_queue)
         self.server.init_server()
         self.server.start()  # in thread plaatsen!
+        self.messages_queue.put("Server started")
+        print("Server started")
         logging.info("Server started")
         self.btn_text.set("Stop server")
 
@@ -116,9 +119,10 @@ class ServerWindow(Frame):
         previous_handlers = set()
         while message != "CLOSE_SERVER":
             self.lst_connectedclients.delete(0, END)
-            handlers = self.server.get_online_users()
-            for handler in handlers:
-                self.lst_connectedclients.insert(END, handler)
+            if message != "CLOSE_SERVER":
+                handlers = self.server.get_online_users()
+                for handler in handlers:
+                    self.lst_connectedclients.insert(END, handler)
             usersinfo = self.server.get_user_data_from_csv("users.csv")
             self.lst_showallclients.delete(0, END)
             for user in usersinfo:
@@ -128,6 +132,8 @@ class ServerWindow(Frame):
             self.messages_queue.task_done()
             message = self.messages_queue.get()
             previous_handlers.update(handlers)
+        if message == "CLOSE_SERVER":
+            self.lstnumbers.insert(END, "Server gestopt")
 
     def update_operaties_sum(self):
         self.lbl_scorerangeoperaties = Label(
