@@ -12,14 +12,14 @@ import datetime
 from pathlib import Path
 import matplotlib.pyplot as plt
 import csv
-
+import socket
 from werkzeug import Client
 
 
 class ClientHandler(threading.Thread):
     numbers_clienthandlers = 0
 
-    def __init__(self, socketclient, messages_queue, par_dataset):
+    def __init__(self, socketclient: socket.socket, messages_queue, par_dataset):
         threading.Thread.__init__(self)
         self.socketclient = socketclient
         self.client_io_obj = self.socketclient.makefile(mode="rw")
@@ -118,7 +118,8 @@ class ClientHandler(threading.Thread):
 
                 commando = io_stream_client.readline().rstrip("\n")
                 data = io_stream_client.readline().rstrip("\n")
-
+            self.client_io_obj.close()
+            self.socketclient.close()
         except Exception as e:
             self.bericht_servergui(f"Error: {e}")
 
@@ -281,3 +282,8 @@ class ClientHandler(threading.Thread):
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(user_data_list)
+
+    def stop_handler(self):
+        self.client_io_obj.write("CLOSE" + "\n")
+        self.client_io_obj.write("\n")
+        self.client_io_obj.flush()

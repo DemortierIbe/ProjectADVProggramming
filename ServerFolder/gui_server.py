@@ -90,8 +90,11 @@ class ServerWindow(Frame):
             self.__start_server()
 
     def __stop_server(self):
-        self.server.stop_server()
+        for handler in self.server.get_online_users():
+            print("stopping handler")
+            handler.stop_handler()
         self.messages_queue.put("CLOSE_SERVER")
+        self.server.stop_server()
         self.server = None
         logging.info("Server stopped")
         self.btn_text.set("Start server")

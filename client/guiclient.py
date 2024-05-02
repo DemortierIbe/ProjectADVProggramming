@@ -26,6 +26,7 @@ import jsonpickle
 import tkinter as tk
 from tkinter import ttk
 import threading
+import time
 
 
 list_all_Countries = [
@@ -520,8 +521,24 @@ class Window(Frame, threading.Thread):
                     messagebox.showerror(
                         "Error", "User already exists or the email is invalid"
                     )
+
             commando = self.my_writer_obj.readline().rstrip("\n")
             data = self.my_writer_obj.readline().rstrip("\n")
+        self.my_writer_obj.write("CLOSE\n")
+        self.my_writer_obj.write("\n")
+        self.my_writer_obj.flush()
+        self.my_writer_obj.close()
+        self.socket_to_server.close()
+        self.master.withdraw()
+        messagebox.showinfo("Connection closed", "Connection with server closed")
+
+        while True:
+            time.sleep(2)
+            try:
+                if self.makeConnnectionWithServer():
+                    break
+            except Exception as ex:
+                logging.error(f"Foutmelding: {ex}")
 
     def login(self):
         username = self.entry_username.get()
